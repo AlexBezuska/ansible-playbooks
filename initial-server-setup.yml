@@ -1,0 +1,21 @@
+---
+- hosts: ivy
+  remote_user: root
+  gather_facts: no
+  pre_tasks:
+    - name: 'install python2'
+      raw: sudo apt-get -y install python-simplejson
+  tasks:
+    - name: configure sudoers
+      lineinfile:
+        dest=/etc/sudoers
+        state=present
+        regexp='^%wheel'
+        insertafter="^%sudo"
+        line='%wheel ALL=(ALL) NOPASSWD:ALL'
+    - name: ensure wheel group is present
+      action: group name=wheel state=present
+    - name: creating a user...
+      action: user state=present shell=/bin/bash groups=wheel name=abezuska
+    - name: adding your ssh key...
+      action: authorized_key user=abezuska key=https://github.com/alexbezuska.keys
